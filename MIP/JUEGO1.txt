@@ -1,0 +1,648 @@
+INCLUDE MIP115.inc
+.data
+ColumnasdePantalla		DWORD	80
+cadenaEtiqueta	BYTE "Nombre: ",0
+cadenaMensaje	BYTE "Bienvenido", 0dh, 0ah, 0dh, 0ah
+				BYTE " ", 0dh, 0ah, 0dh, 0ah, 0
+fondo BYTE	" "
+fondoColor DWORD (gray*16)+gray
+
+
+
+LimitePantallaIzquierda	BYTE	0
+pantallaLimiteDerecho	BYTE	79
+SalirBandera			BYTE	0
+ganadorEtiqueta	BYTE	"Mensaje Juego", 0
+ganadorPregunta	BYTE	"GANASTE!", 0dh, 0ah
+		
+perdedorEtiqueta		BYTE	"Mensaje Juego", 0
+perdedorPregunta	BYTE	"PERDISTE!", 0dh, 0ah
+				BYTE	"Te gustaria intentalor otra vez?", 0
+ColorFrenteMascara BYTE 0Fh
+
+JugadorPrincipal			BYTE	06h, 0		;caracter de pocker
+JugadorPrincipalMoverVel	BYTE	1
+ColorFrenteJugadorPrincipal	BYTE	white		;0Fh
+JugadorPrincipalBackColor	BYTE	green*16	;20h
+JugadorPrincipalX			BYTE	20
+JugadorPrincipalY			BYTE	20
+ViejoJugadorX		BYTE	20
+ViejoJugadorY		BYTE	20
+
+BalaSimbolo		BYTE	0fh, 0
+ColorFrenteBala	BYTE	lightblue	;09h
+BalaColorFondo		BYTE	gray*16		;80h
+BalaBandera			BYTE	0
+BalaX				BYTE	0
+BalaY				BYTE	0
+ViejaBalaX			BYTE	0
+ViejaBalaY			BYTE	0
+
+puntajeColor	DWORD	white+(magenta*16)
+puntajeMsg	BYTE	"Puntaje:", 0
+puntaje		DWORD	0
+puntajeganador	DWORD	5
+puntajeY		BYTE	22
+puntajeX		BYTE	40
+
+vidaColor				DWORD	white+(magenta*16)
+ColorAdvertenciaVida		DWORD	lightred+(lightblue*16)
+vidaAdvertenciaBarraColor	DWORD	white+(gray*16)
+vidaAdvertenciaBarra		BYTE	0
+vidaresetSimbolo			BYTE	6 DUP(" ")
+vidaMensaje					BYTE	"Vida:", 0
+vidaY					BYTE	22
+vidaX					BYTE	20
+vida					DWORD	3
+vidaInicial				DWORD	3
+
+particulaSimbolo		BYTE	"8", 0
+particulareseteasimbolo	BYTE	" "
+particulaX			BYTE	?
+particulaY			BYTE	?
+explosionBandera		BYTE	0
+explosionColorFrente	BYTE	magenta		;05h
+explosionBackColor	BYTE	red*16	;00h
+
+simboloEnemigo			BYTE	49h, 49h, 49h, 49h, 0
+TamanioEnemigo			BYTE	4
+enemigoResetSimbolo	BYTE	4 DUP(" ")	; debe ser igual al tamanio del enemigo
+enemigoInitX			BYTE	0
+enemigoInitY		    	BYTE	5
+enemigoX				BYTE	0
+enemigoY				BYTE	5
+enemigoColorFrente		BYTE	magenta		;05h
+enemigoColorFondo		BYTE	yellow*16	;0E0h
+limiteenemigoGolpeadoBandera	BYTE 	0
+enemigoLineaReset		BYTE	80 DUP(" ")  ;debe ser igual al numero de columnas del juego
+        
+
+
+
+.code
+main PROC
+
+	call Clrscr						; limpia pantalla
+	call Intro
+	mov ebx, OFFSET cadenaEtiqueta
+	mov edx, OFFSET cadenaMensaje
+	call MsgBox
+	
+	L0:
+	
+	
+	call ManejadorEventosTecla	;Primero se escuchan las teclas
+	call LimpiaJugadorViejaPos ;Se limpian posiciones viejas del jugador
+	call LimpiarBalaViejaPos
+	call BorrarEnemigo
+	call limpiarExplosion
+	
+	call veriGolpebalaEnemigo; verifica si hay colision entre la bala y el enemigo
+	call actualizarEnemigo;
+	call MostrarJugadorPrincipal; muestra al jugador
+	
+	 call mostrarEnemigo;muestra al enemigo
+	call MostrarBala ;muestra la bala
+	call mostrarExplosion; muestra una explosión para el enemigo
+	call mostrarVida; muestra la vida que tiene disponible el jugador
+	call mostrarPuntaje	;presenta el puntaje
+	call verificarVida ;verifica el nivel de vidas
+	
+	
+	add ColorFrenteBala, 1 
+	add enemigoColorFrente, 2
+	add explosionColorFrente, 3
+    
+
+	
+	cmp SalirBandera, 1
+	je Exit0
+	jmp L0
+
+Exit0:
+	INVOKE ExitProcess, 0
+main ENDP
+
+limpiarExplosion PROC USES eax edx
+	cmp explosionBandera, 2
+	jne nadaquelimpiar
+	
+	mov eax, fondoColor
+	call SetTextColor
+	
+	;restablecer particula Izquierda-superior  
+	mov ah, particulaY
+	sub ah, 1
+	mov dh, ah
+	mov al, particulaX
+	sub al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulareseteasimbolo
+	call WriteString
+	
+	;restablecer particula Izquierda-inferior 
+	mov ah, particulaY
+	add ah, 1
+	mov dh, ah
+	mov al, particulaX
+	sub al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulareseteasimbolo
+	call WriteString
+	
+
+	;restablecer particula derecha inferior
+	mov ah, particulaY
+	add ah, 1
+	mov dh, ah
+	mov al, particulaX
+	add al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulareseteasimbolo
+	call WriteString
+	
+	;; restablecer la partícula derecha superior
+	mov ah, particulaY
+	sub ah, 1
+	mov dh, ah
+	mov al, particulaX
+	add al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulareseteasimbolo
+	call WriteString
+	
+	mov explosionBandera, 0
+	
+nadaquelimpiar:	
+	ret
+limpiarExplosion ENDP
+
+veriGolpebalaEnemigo PROC USES eax
+	;Si (enemigoY == BalaY) y (enemigoX <= BalaX <= enemigoX+4) 
+	;entonces explosionBandera = 1
+	;delo contrario no cambiar
+
+	mov al, enemigoY
+	cmp BalaY, al
+	jne nocambiar
+	mov al, enemigoX
+	cmp BalaX, al
+	jb nocambiar
+	add al, TamanioEnemigo; a la posicion del enemigo se le suma 4 unidades
+	cmp BalaX, al
+	ja nocambiar
+	mov explosionBandera, 1
+	add enemigoColorFondo, 16
+	
+nocambiar:
+	ret
+veriGolpebalaEnemigo ENDP
+
+mostrarExplosion PROC USES eax edx
+	cmp explosionBandera, 0
+	je	noexplosion
+	
+	xor eax, eax
+	mov al, explosionBackColor
+	mov dl, ColorFrenteMascara
+	and explosionColorFrente, dl
+	add al, explosionColorFrente
+	call SetTextColor
+	
+	
+	;particula X/Y son usados en LimpiarExplosion
+	mov ah, BalaY
+	mov particulaY, ah
+	mov al, BalaX
+	mov particulaX, al
+
+	;dibujar particulas izquierda superior
+	mov ah, BalaY
+	sub ah, 1
+	mov dh, ah
+	mov al, BalaX
+	sub al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulaSimbolo
+	call WriteString
+	
+	
+	;dibujar izquierda-inferior particula
+	mov ah, BalaY
+	add ah, 1
+	mov dh, ah
+	mov al, BalaX
+	sub al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulaSimbolo
+	call WriteString
+	
+
+	;dibujar particula en derecha-inferior
+	mov ah, BalaY
+	add ah, 1
+	mov dh, ah
+	mov al, BalaX
+	add al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulaSimbolo
+	call WriteString
+	
+
+	;dibujar derecha superior particula
+	mov ah, BalaY
+	sub ah, 1
+	mov dh, ah
+	mov al, BalaX
+	add al, 1
+	mov dl, al
+	call Gotoxy
+	mov edx, offset particulaSimbolo
+	call WriteString
+	
+	; resetear posicion de bala
+	mov BalaY, 0
+	mov BalaX, 0
+	
+noexplosion:
+	ret
+mostrarExplosion ENDP 
+
+mostrarEnemigo PROC USES eax edx
+	xor eax, eax
+	mov al, enemigoColorFondo; 1110*
+                          	;yellow*16=11100000
+	mov dl, ColorFrenteMascara ;dl=0F
+	and enemigoColorFrente, dl; 05h and 0F
+	add al, enemigoColorFrente
+	call SetTextColor
+	mov dh, enemigoY
+	mov dl, enemigoX
+	call Gotoxy
+	mov edx, offset simboloEnemigo
+	call WriteString
+	ret
+mostrarEnemigo ENDP
+
+actualizarEnemigo PROC USES eax
+	cmp explosionBandera, 1
+	je resetPosicionEnemigo
+	mov al, pantallaLimiteDerecho
+	sub al, TamanioEnemigo
+	cmp enemigoX, al
+	je limiteenemigoGolpeado
+
+	inc enemigoX
+	jmp continue
+	
+limiteenemigoGolpeado:
+	mov limiteenemigoGolpeadoBandera, 1
+	
+resetPosicionEnemigo:
+	call BorrarEnemigoLine
+	mov al, enemigoInitX
+	mov enemigoX, al
+	
+continue:
+	ret
+actualizarEnemigo ENDP
+
+
+BorrarEnemigo PROC USES eax edx
+	mov eax, fondoColor
+	call SetTextColor
+	mov dh, enemigoY
+	mov dl, enemigoX
+	call Gotoxy
+	mov edx, offset enemigoResetSimbolo
+	call WriteString
+	ret
+BorrarEnemigo ENDP
+
+BorrarEnemigoLine PROC USES eax edx
+	mov eax, fondoColor
+	call SetTextColor
+	mov dh, enemigoY
+	mov dl, 0
+	call Gotoxy
+	mov edx, offset enemigoLineaReset
+	call WriteString
+	ret
+BorrarEnemigoLine ENDP
+
+
+MostrarBala PROC USES eax edx
+	cmp BalaBandera, 0
+	je nomostrar
+	cmp ViejaBalaY, 1
+	jbe desaparecer
+	cmp explosionBandera, 1
+	je	desaparecer
+	mov dh, BalaY
+	mov dl, BalaX
+	call Gotoxy
+	xor eax, eax
+	mov al, BalaColorFondo
+	mov dl, ColorFrenteMascara
+	and ColorFrenteBala, dl
+	add al, ColorFrenteBala
+	call SetTextColor
+	mov edx, offset BalaSimbolo
+	call WriteString
+	dec BalaY
+	jmp nomostrar
+	
+desaparecer:
+	mov BalaBandera, 0
+nomostrar:
+	ret	
+MostrarBala ENDP
+
+LimpiarBalaViejaPos PROC USES eax edx
+	mov dh, ViejaBalaY
+	mov dl, ViejaBalaX
+	call LimpiarBalaPos
+	mov al, BalaY
+	mov ViejaBalaY, al
+	ret
+LimpiarBalaViejaPos ENDP
+
+
+LimpiarBalaPos PROC USES eax
+	mov eax, fondoColor
+	call SetTextColor
+	call Gotoxy
+	push edx
+	mov edx, offset fondo
+	call WriteString
+	pop edx
+	ret
+LimpiarBalaPos ENDP
+
+;INTRO DEL JUEGO
+
+Intro PROC
+	pushad
+	mov eax, fondoColor
+	call SetTextColor
+	mov dh, 0
+	mov dl, 0
+	mov bx, dx
+	mov eax, 80
+	mov ecx, eax
+	
+L1:	
+	mov eax, ecx
+	mov ecx, 20
+	
+L0:
+	mov dx, bx	
+	call Gotoxy
+	mov edx, offset fondo
+	call WriteString
+	inc bh
+	loop L0
+	mov bh, 0
+	inc bl
+	mov ecx, eax
+	loop L1
+	popad
+	ret
+Intro ENDP
+
+
+
+
+MostrarJugadorPrincipal PROC USES eax edx
+	xor eax, eax
+	mov al, JugadorPrincipalBackColor;20h
+	mov dl, ColorFrenteMascara; 0Fh
+	and ColorFrenteJugadorPrincipal, dl; 0F y 0F
+	add al, ColorFrenteJugadorPrincipal; 20h+0Fh=2Fh
+	call SetTextColor
+	mov dh, JugadorPrincipalY
+	mov dl, JugadorPrincipalX
+	call Gotoxy
+	mov edx, offset JugadorPrincipal
+	call WriteString
+	ret
+MostrarJugadorPrincipal ENDP
+
+
+mostrarVida PROC USES eax edx
+	mov eax, vidaColor
+	cmp vida, 1
+	ja sinadvertencia
+
+	call limpiarMostrarVida
+	mov eax, ColorAdvertenciaVida
+	cmp vidaAdvertenciaBarra, 1
+	je advertir
+	mov eax, vidaAdvertenciaBarraColor
+	mov vidaAdvertenciaBarra, 1
+	jmp sinadvertencia
+
+advertir:
+	mov vidaAdvertenciaBarra, 0
+
+sinadvertencia:
+	call SetTextColor
+	mov dh, vidaY
+	mov dl, vidaX
+	call Gotoxy
+	mov edx, offset vidaMensaje
+	call WriteString
+	add dl, 6
+	call Gotoxy
+	cmp limiteenemigoGolpeadoBandera, 0
+	je permanecer
+	dec vida
+	mov limiteenemigoGolpeadoBandera, 0
+
+	
+permanecer:
+	mov eax, vida
+	call WriteDec
+	ret
+mostrarVida ENDP
+
+
+
+
+limpiarMostrarVida PROC USES eax edx
+	mov eax, 00000000h
+	call SetTextColor
+	mov dh, vidaY
+	mov dl, vidaX
+	call Gotoxy
+	mov edx, offset vidaresetSimbolo
+	call WriteString
+	ret
+limpiarMostrarVida ENDP
+
+mostrarPuntaje PROC USES eax edx
+	mov eax, puntajeColor
+	call SetTextColor
+	mov dh, puntajeY
+	mov dl, puntajeX
+	call Gotoxy
+	mov edx, offset puntajeMsg
+	call WriteString
+	add dl, 7
+	call Gotoxy
+	cmp explosionBandera, 0
+	je permanecer
+	inc puntaje
+	mov explosionBandera, 2
+	
+permanecer:
+	mov eax, puntaje
+	call WriteDec
+	ret
+mostrarPuntaje ENDP
+
+
+verificarVida PROC USES eax ebx edx
+	mov eax, puntajeganador
+	cmp puntaje, eax
+	jne L4
+	mov ebx, OFFSET ganadorEtiqueta
+	mov edx, OFFSET ganadorPregunta
+	call MsgBoxAsk
+	cmp eax, 6	; usuario presiona 'y'
+	je L5
+	mov SalirBandera, 1
+	ret
+	
+L5:
+	mov eax, vidaInicial
+	mov vida, eax
+	mov puntaje, 0
+	ret
+	
+L4:	
+	cmp vida, 0
+	je L0
+	ret
+	
+L0:
+	mov ebx, OFFSET perdedorEtiqueta
+	mov edx, OFFSET perdedorPregunta
+	call MsgBoxAsk
+	cmp eax, 6
+	je L1
+	mov SalirBandera, 1
+	
+L1:
+	mov eax, vidaInicial
+	mov vida, eax
+	mov puntaje, 0
+    mov BalaBandera, 0    
+	ret	
+verificarVida ENDP
+
+
+
+ManejadorEventosTecla PROC
+	pushad
+	mov eax, 50
+	call Delay		;cada marco tiene un timepo de  50 milisegundos.
+	call ReadKey
+	cmp al, 'a'
+	je Izquierda
+	cmp al, 'd'
+	je Derecha
+	cmp al, ' '
+	je Fuego
+	cmp dx, 001Bh	;tecla ESC
+	je Salir
+	jmp	L1
+	
+Izquierda:
+	call ManejadorEventosTeclaIzquierda
+	jmp L1
+	
+Derecha:
+	call ManejadorEventosTeclaDerecha
+	jmp L1
+	
+Fuego:
+	call ActivaBala 
+	jmp L1
+	
+Salir:
+	mov SalirBandera, 1
+	
+L1:
+	popad
+	ret
+ManejadorEventosTecla ENDP 
+
+
+ManejadorEventosTeclaIzquierda PROC USES eax
+	mov al, LimitePantallaIzquierda
+	inc al
+	cmp JugadorPrincipalX, al	;revisa el limite de la izquierda de la pantalla
+	jbe dejar
+	mov al, JugadorPrincipalMoverVel
+	sub JugadorPrincipalX, al
+	
+dejar:
+	ret
+ManejadorEventosTeclaIzquierda ENDP 
+
+
+ManejadorEventosTeclaDerecha PROC USES eax
+	mov al, pantallaLimiteDerecho
+	dec al
+	cmp JugadorPrincipalX, al	;verificar limite derecho
+	jae quedar
+	mov al, JugadorPrincipalMoverVel
+	add JugadorPrincipalX, al
+	
+quedar:
+	ret
+ManejadorEventosTeclaDerecha ENDP 
+ActivaBala PROC USES eax
+	cmp BalaBandera, 1
+	je dejar
+	mov BalaBandera, 1
+	mov al, JugadorPrincipalY
+	dec al
+	mov BalaY, al
+	mov ViejaBalaY, al
+	mov al, JugadorPrincipalX
+	mov BalaX, al
+	mov ViejaBalaX, al
+dejar:
+	ret
+ActivaBala ENDP
+
+LimpiaJugadorViejaPos PROC USES eax edx
+	mov dh, ViejoJugadorY
+	mov dl, ViejoJugadorX
+	call LimpiaPosNegro
+	mov al, JugadorPrincipalY
+	mov ViejoJugadorY, al
+	mov al, JugadorPrincipalX
+	mov ViejoJugadorX, al
+	ret
+LimpiaJugadorViejaPos ENDP
+LimpiaPosNegro PROC USES eax edx
+	mov ah, black
+	mov al, black
+	call SetTextColor
+	call Gotoxy
+	mov edx, offset fondo
+	call WriteString
+	ret
+LimpiaPosNegro ENDP
+
+END MAIN

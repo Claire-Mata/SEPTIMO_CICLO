@@ -1,0 +1,160 @@
+INCLUDE mip115.inc
+.data
+strPuntaje BYTE "PUNTOS: ",0
+suelo BYTE "----------------------------------------------------------------",0
+puntaje BYTE 0
+xPos BYTE 20
+yPos BYTE 20
+xPremioPos BYTE ?
+yPremioPos BYTE ?
+entrada BYTE ?
+.code
+main Proc
+
+	;colocamos cursor
+	mov dl,0
+	mov dl,27
+	call Gotoxy
+	;para dibujar
+	mov edx,OFFSET suelo
+	call WriteString ;aqui lo dibuja
+	;INICIALIZAMOS
+	call DibujarJugador
+	call CrearPremioRandom
+	call DibujarPremio
+	call Randomize ;semilla de los valores aleatorios
+	JuegoLoop:
+		mov bl,xPos
+		cmp bl,xPremioPos ;comparamos por si el jugador llega al premio
+		jne noRecolecta;no son iguales
+		mov bl,yPos
+		cmp bl,yPremioPos 
+		jne noRecolecta;no son iguales en y
+		inc puntaje ;si es igual se incrementa el puntaje
+		call CrearPremioRandom
+		call DibujarPremio
+
+		noRecolecta:
+			;para el puntaje
+				mov  eax,white(black*16)
+				call SetTextColor
+				mov dl,0
+				mov dh,0
+				call Gotoxy
+				mov edx,OFFSET strPuntaje 
+				call writeString 
+				mov al,puntaje ;imprime mi puntaje
+				call writeInt;mostrar un entero por eso se coloca en al
+		
+				;LOGICA DE GRAVEDAD por comparaciones
+				gravedad:
+					cmp yPos,27; el piso esta en el 27
+					jg sobrePiso;si se cumple
+					call ActualizarJugador
+					inc yPos ;permitirle que se desplaze en forma vertical
+					call DibujarJugador
+					mov eax,80;	DEMORA de 80 milisegundos
+					call Delay
+					jmp gravedad ;salto o loop
+
+					sobrePiso:
+						call ReadChar ;lo que ingresa el usuario
+						mov entrada,al
+						
+						cmp entrada,"x"
+						je salirJuego ;si son iguales
+						
+						cmp entrada,"w"
+						je MoverArriba
+
+						cmp entrada,"s"
+						je MoverAbajo
+
+						cmp entrada,"a"
+						je MoverIzquierda
+
+						cmp entrada,"d"
+						je MoverDerecha
+
+						MoverArriba:
+							mov ecx,1 ;ecx es un contador 
+							SaltoLoop:
+								call ActualizarJugador
+								dec yPos ;decrementamos
+								call DibujarJugador
+							loop SaltoLoop
+							jmp JuegoLoop
+
+						MoverAbajo:
+							call ActualizarJugador
+							inc yPos
+							call DibujarJugador
+							jmp JuegoLoop
+
+						MoverIzquierda:
+							call ActualizarJugador
+							dec xPos
+							call DibujarJugador
+							jmp JuegoLoop
+
+						MoverDerecha:
+							call ActualizarJugador
+							inc xPos
+							call DibujarJugador
+							jmp JuegoLoop
+
+						salirJuego:
+						exit
+
+main ENDP
+
+DibujarJugador PROC
+
+	;colocar el cursor
+	 mov dl,xPos
+	 mov dh,yPos
+	 call Gotoxy ;coloca el cursor
+
+	 ;el jugador
+	 mov al, "x"
+	 call writeChar;impimimos el jugador
+	 ret
+DibujarJugador ENDP
+
+ActualizarJugador PROC
+
+	;colocar el cursor
+	 mov dl,xPos
+	 mov dh,yPos
+	 call Gotoxy ;coloca el cursor
+
+	 ;el jugador se borra
+	 mov al, " "
+	 call writeChar;impimimos el espacio en blanco
+	 ret
+ActualizarJugador ENDP
+
+DibujarPremio PROC
+	;ponemos el color
+	mov eax,yellow(yellow*16)
+	call SetTextColor ;establece el color
+
+	;colocar el cursor
+	 mov dl,xPremioPos
+	 mov dh,yPremioPos
+	 call Gotoxy ;coloca el cursor
+	 ;el premio
+	 mov al, "?"
+	 call writeChar;impimimos el premio
+	 ret
+DibujarPremio ENDP
+
+CrearPremioRandom PROC
+	mov eax,55
+	inc eax ;incremento
+	call RandomRange ;lo coloca en el registro al
+	mov xPremioPos,al ;pasamos lo que este en el random al premio
+	mov yPremioPos,27
+	ret
+CrearPremioRandom ENDP
+end main

@@ -1,0 +1,49 @@
+INCLUDE MIP115.inc
+TAMANIO_BUFFER =501 ;FINALIZACION DE CONJUNTO DE CARACTERES
+.data
+buffer BYTE TAMANIO_BUFFER DUP(?)
+nombrearchivo BYTE "output.txt",0
+manejadorArchivo HANDLE ? ;llevar el control de archivos
+tamanioCadena DWORD ?
+escribirBytes DWORD ?
+cadena1 BYTE "No se puede crear el archivo" ,0DH, 0AH,0 ;indicador de problemas
+cadena2 BYTE "Bytes escritos exitosamente en archivo output.txt: ",0
+cadena3 BYTE "Ingrese un maximo de 500 caracteres y presione enter"
+		BYTE "[ENTER]", 0DH, 0AH,0
+.code
+main PROC
+;CREAMOS EL TXT
+mov edx,OFFSET nombrearchivo
+call CreateOutputFile
+mov manejadorArchivo, eax
+
+;CORROBORAMOS SI SE HIZO
+cmp eax,INVALID_HANDLE_VALUE
+jne archivo_listo
+mov edx,OFFSET cadena1
+call WriteString
+jmp salir
+
+archivo_listo:
+	mov edx, OFFSET cadena3
+	call WriteString
+	mov ecx, TAMANIO_BUFFER
+	mov edx, OFFSET buffer
+	call ReadString
+	mov tamanioCadena,eax
+	mov eax,manejadorArchivo
+	mov edx, OFFSET buffer
+	mov ecx, tamanioCadena
+	call WriteToFile
+	mov escribirBytes, eax
+	call CloseFile
+	mov edx, OFFSET cadena2
+	call WriteString
+	mov eax, escribirBytes ;almacena cuantos caracteres se escribieron
+	call WriteDec
+	call CrLf ;respectivo espacio
+salir:
+	exit
+main ENDP
+	
+END main

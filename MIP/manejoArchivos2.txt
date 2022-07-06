@@ -1,0 +1,36 @@
+INCLUDE MIP115.inc
+.data
+  buffer BYTE "ESTE ES EL TEXTO A AGREGAR",0dh,0ah ;buffer estatico
+  bufferTamanio DWORD ($-buffer)
+  error BYTE "no se puede abrir el archivo",0dh,0ah,0
+  nombrearchivo BYTE "output.txt",0
+  manejadorArchivo HANDLE ?
+  bytesEscribir DWORD ?
+
+.code
+;creamos el txt con un metodo de windows32
+main PROC
+	INVOKE CreateFile,
+	ADDR nombrearchivo,GENERIC_WRITE,DO_NOT_SHARE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0
+	
+	mov manejadorArchivo, eax
+	.IF eax==INVALID_HANDLE_VALUE
+		mov edx, OFFSET error
+		call WriteString
+		jmp SalirAhora
+	.ENDIF
+
+	
+INVOKE SetFilePointer,manejadorArchivo,0,0,FILE_END ;cada vez que se le de apertura al archivo el puntero se pondra al final
+
+;escribimos cosas adentro
+INVOKE WriteFile,manejadorArchivo,ADDR buffer,bufferTamanio,ADDR bytesEscribir,0
+
+;cerrar archivo
+INVOKE CloseHandle,manejadorArchivo
+
+SalirAhora:
+	exit
+
+main ENDP
+END main

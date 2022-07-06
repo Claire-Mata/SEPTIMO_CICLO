@@ -1,0 +1,355 @@
+ExitProcess proto
+ReadInt64 proto
+ReadString proto
+WriteString proto
+WriteHex64 proto
+Crlf proto
+TAMANIO_BUFFER=1000
+.data
+txtRegre BYTE " ", 0ah,0dh,"Deseas regresar AL MENU(R/n) : ",0
+txtErrorOpc BYTE "Ingrese una opcion valida",0
+regresar qword ?
+mensaje3 BYTE " ", 0ah,0dh, "ingrese I(izquierda), D(derecha)", 0
+mensaje BYTE "Menu", 0ah,0dh, 
+"1. Encriptar", 0ah,0dh, 
+"2. Desencriptar", 0ah,0dh, 
+"3. Ver palabra", 0ah,0dh,
+"4. Salir", 0ah,0dh,
+"Ingrese una opcion:  ", 0
+mensajeEncriptar BYTE " ", 0ah,0dh,"No debe ingresar mas de 15 caracteres", 0ah, 0dh,
+"Ingrese la palabra a Encriptar: ", 0
+mensajeDesencriptar BYTE " ", 0ah,0dh,"No debe ingresar mas de 15 caracteres", 0ah, 0dh,
+"Ingrese la palabra a Desencriptar: ", 0
+mensajeMayus BYTE " ", 0ah,0dh, "Las mayusculas no estan permitidas", 0
+mensajeNum BYTE " ", 0ah,0dh, "Los numeros no estan permitidos", 0
+valido BYTE " ", 0ah,0dh, "ingrese un digito valido",0dh,0ah
+tamanio qword ?
+MAX = 15
+espacio BYTE "                                ", 0
+espacio2 BYTE "                ", 0
+espacio3 BYTE "                                                   ", 0
+palabra   BYTE   MAX + 1 DUP(0)
+opc BYTE 0
+opc2 BYTE 0
+bandera qword 0
+arr_Caracteres BYTE "(", "#", "&", "*", "@", 0
+arr_Vocales BYTE "a", "e", "i", "o", "u", 0
+verificar BYTE 1
+.code
+main proc
+;no entiendo el porque no me limpia pantalla :/
+ call Crlf ;Limpiar pantalla
+	Menu:
+	call Crlf
+	mov rdx, offset mensaje
+	call WriteString
+	mov rcx, 2
+	mov rdx,offset opc
+	call ReadString
+	call Crlf
+	 cmp opc,'1';COMPARAMOS
+    jne siguiente
+	call Crlf
+	call encriptar
+	jmp regre
+	siguiente:
+    cmp opc,'2';COMPARAMOS
+    jne siguiente2
+	call desencriptar
+	jmp regre
+	siguiente2:
+    cmp opc,'3';COMPARAMOS
+    jne siguiente3
+	call mostrarPalabra
+	jmp regre
+	siguiente3:
+    cmp opc,'4';COMPARAMOS
+    jmp salir
+    call errorOpc;SI NOS DA ALGUN ERROR
+    jmp menu
+	regre:
+	mov rdx, offset txtRegre
+	call WriteString
+	mov rcx, 2
+	mov rdx,offset regresar
+    ;Obtiene la tecla que presiona el usuario
+    call ReadString
+    cmp regresar,'R'
+    je menu
+    cmp regresar,"n"
+    jmp salir
+    call errorOpc
+    ;jmp opc3
+    salir:
+    call Crlf ;Limpiar pantalla
+    call ExitProcess
+main endp
+;POR SI NOS DA ERROR(no funciona por el momento)
+errorOpc PROC
+    mov rdx,OFFSET txtErrorOpc    ;Texto a imprimir
+    call WriteString        ;Impresion
+    ret
+errorOpc ENDP
+;AQUI SOLO MOSTRAMOS LA PALABRA
+mostrarPalabra PROC
+	call Crlf ;Limpiar pantalla
+	mov rdx, offset espacio
+	call WriteString
+	mov rdx, offset palabra
+	call WriteString
+
+	mov rdx, offset mensaje3
+	call WriteString
+	mov rcx, 2
+	mov rdx,offset opc2
+    ;Obtiene la tecla que presiona el usuario
+    call ReadString
+    cmp opc2,'I'
+    je i
+    cmp opc2,"D"
+    jmp d
+	i:
+	mov rdx, offset espacio2
+	call WriteString
+	mov rdx, offset palabra
+	call WriteString
+	d:
+	mov rdx, offset espacio3
+	call WriteString
+	mov rdx, offset palabra
+	call WriteString
+
+	salir:
+	ret
+mostrarPalabra ENDP
+;CODIGO PARA ENCRIPTAR
+encriptar PROC
+ call Crlf ;Limpiar pantalla
+	mov rdx, offset mensajeEncriptar
+	call WriteString
+	mov rcx, MAX
+	mov rdx,offset palabra
+	call ReadString
+	mov tamanio, rax
+	call validarMayus
+	call validarNum
+	cmp bandera, 1
+	je salir
+	call Crlf
+	mov rcx, 0
+comparando: 
+	cmp rcx, tamanio
+	je imprimir 
+	mov rbx, 0
+	mov al, palabra[rcx]
+	cmp al, 'a'
+	je A
+	cmp al, 'e'
+	je E
+	cmp al, 'i'
+	je I
+	cmp al, 'o'
+	je O
+	cmp al, 'u'
+	je U
+	jmp incrementar
+	A:
+		mov al, arr_Caracteres[0]
+		mov palabra[rcx], al
+		jmp incrementar
+	E:
+		mov al, arr_Caracteres[1]
+		mov palabra[rcx], al
+		jmp incrementar
+	I:
+		mov al, arr_Caracteres[2]
+		mov palabra[rcx], al
+		jmp incrementar
+	O:
+		mov al, arr_Caracteres[3]
+		mov palabra[rcx], al
+		jmp incrementar
+	U:
+		mov al, arr_Caracteres[4]
+		mov palabra[rcx], al
+		jmp incrementar
+	incrementar:
+		inc rcx
+		jmp comparando
+	imprimir:
+		mov rdx, offset palabra
+		call WriteString
+    salir:
+    ret
+encriptar ENDP
+;CODIGO PARA DESCENCRIPTAR
+desencriptar PROC
+	mov rdx, offset mensajeDesencriptar
+	call WriteString
+	mov rcx, MAX
+	mov rdx,offset palabra
+	call ReadString
+	mov tamanio, rax
+	call validarMayus
+	call validarNum
+	cmp bandera, 1
+	je salir
+	call Crlf
+	mov rcx, 0
+	;CODIGO QUE COMPRARA CUANDO METE UN CARACTER
+comparando: 
+	cmp rcx, tamanio
+	je imprimir 
+	mov rbx, 0
+	mov al, palabra[rcx]
+	cmp al, '('
+	je A
+	cmp al, '#'
+	je E
+	cmp al, '&'
+	je I
+	cmp al, '*'
+	je O
+	cmp al, '@'
+	je U
+	jmp incrementar
+	A:
+		mov al, arr_Vocales[0]
+		mov palabra[rcx], al
+		jmp incrementar
+	E:
+		mov al, arr_Vocales[1]
+		mov palabra[rcx], al
+		jmp incrementar
+	I:
+		mov al, arr_Vocales[2]
+		mov palabra[rcx], al
+		jmp incrementar
+	O:
+		mov al, arr_Vocales[3]
+		mov palabra[rcx], al
+		jmp incrementar
+	U:
+		mov al, arr_Vocales[4]
+		mov palabra[rcx], al
+		jmp incrementar
+	incrementar:
+		inc rcx
+		jmp comparando
+	imprimir:
+	mov rdx, offset palabra
+	call WriteString
+    salir:
+    ret
+desencriptar ENDP
+;CODIGO PARA VALIDAR SI EL USUARIO INGRESA NUMEROS
+validarNum PROC
+	mov bandera, 0
+	mov rcx, 0
+	numeros:
+	cmp rcx, tamanio
+	je salir 
+	mov rbx, 0
+	mov al, palabra[rcx]
+	cmp al, '0'
+	je val
+	cmp al, '1'
+	je val
+	cmp al, '2'
+	je val
+	cmp al, '3'
+	je val
+	cmp al, '4'
+	je val
+	cmp al, '5'
+	je val
+	cmp al, '6'
+	je val
+	cmp al, '7'
+	je val
+	cmp al, '8'
+	je val
+	cmp al, '9'
+	je val
+	jmp incrementa
+	incrementa:
+		inc rcx
+		jmp numeros
+	val:
+	mov rdx, offset mensajeNum
+	call WriteString
+	mov bandera, 1
+	salir:
+	ret
+validarNum ENDP
+;CODIGO PARA VALIDAR SI INGRESA MAYUSCULA
+validarMayus PROC
+	mov bandera, 0
+	mov rcx, 0
+	mayusculas: 
+	cmp rcx, tamanio
+	je salir 
+	mov rbx, 0
+	mov al, palabra[rcx]
+	cmp al, 'A'
+	je val
+	cmp al, 'B'
+	je val
+	cmp al, 'C'
+	je val
+	cmp al, 'D'
+	je val
+	cmp al, 'E'
+	je val
+	cmp al, 'F'
+	je val
+	cmp al, 'G'
+	je val
+	cmp al, 'H'
+	je val
+	cmp al, 'I'
+	je val
+	cmp al, 'J'
+	je val
+	cmp al, 'K'
+	je val
+	cmp al, 'L'
+	je val
+	cmp al, 'M'
+	je val
+	cmp al, 'N'
+	je val
+	cmp al, 'O'
+	je val
+	cmp al, 'P'
+	je val
+	cmp al, 'Q'
+	je val
+	cmp al, 'R'
+	je val
+	cmp al, 'S'
+	je val
+	cmp al, 'T'
+	je val
+	cmp al, 'V'
+	je val
+	cmp al, 'W'
+	je val
+	cmp al, 'X'
+	je val
+	cmp al, 'Y'
+	je val
+	cmp al, 'Z'
+	je val
+	jmp incrementa
+	incrementa:
+		inc rcx
+		jmp mayusculas
+	val:
+	mov rdx, offset mensajeMayus
+	call WriteString
+	mov bandera, 1
+	salir:
+	ret
+validarMayus ENDP
+end
