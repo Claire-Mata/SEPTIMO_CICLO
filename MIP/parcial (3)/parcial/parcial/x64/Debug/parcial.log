@@ -1,0 +1,82 @@
+﻿  Assembling parcial.asm...
+C:\libreria\Ventana.inc(4): error A2008: syntax error : .
+C:\libreria\Ventana.inc(5): error A2008: syntax error : .
+C:\libreria\Ventana.inc(6): error A2008: syntax error : .
+C:\libreria\Ventana.inc(293): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(296): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(305): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(308): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(312): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(317): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(326): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(333): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(337): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(341): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(345): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(351): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(356): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(359): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(363): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(366): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(374): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(379): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(384): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(387): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(392): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(397): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(400): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(406): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(412): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(415): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(422): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(428): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(435): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(438): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(442): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(446): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(450): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(454): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(458): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(461): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(466): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(472): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(475): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(478): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(482): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(489): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(496): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(503): error A2008: syntax error : ,
+C:\libreria\Ventana.inc(510): error A2008: syntax error : near
+C:\libreria\MIP115.INC(22): error A2008: syntax error : ,
+C:\libreria\MIP115.INC(66): error A2008: syntax error : ,
+C:\libreria\MIP115.INC(71): error A2008: syntax error : ,
+C:\libreria\MIP115.INC(76): error A2008: syntax error : ,
+C:\libreria\MIP115.INC(82): error A2008: syntax error : ,
+C:\libreria\MIP115.INC(87): error A2008: syntax error : ,
+C:\libreria\MIP115.INC(93): error A2008: syntax error : ,
+C:\libreria\MIP115.INC(99): error A2008: syntax error : ,
+parcial.asm(34): error A2070: invalid instruction operands
+parcial.asm(34): error A2070: invalid instruction operands
+parcial.asm(35): error A2070: invalid instruction operands
+parcial.asm(35): error A2070: invalid instruction operands
+parcial.asm(36): error A2070: invalid instruction operands
+parcial.asm(36): error A2070: invalid instruction operands
+parcial.asm(37): error A2070: invalid instruction operands
+parcial.asm(37): error A2070: invalid instruction operands
+parcial.asm(57): error A2070: invalid instruction operands
+parcial.asm(57): error A2070: invalid instruction operands
+parcial.asm(76): error A2008: syntax error : INVOKE
+parcial.asm(98): warning A4010: expected '>' on text literal
+parcial.asm(98): warning A4006: too many arguments in macro call
+parcial.asm(98): error A2070: invalid instruction operands
+parcial.asm(98): error A2070: invalid instruction operands
+parcial.asm(106): error A2070: invalid instruction operands
+parcial.asm(106): error A2070: invalid instruction operands
+parcial.asm(112): error A2070: invalid instruction operands
+parcial.asm(112): error A2070: invalid instruction operands
+parcial.asm(184): error A2008: syntax error : pushad
+parcial.asm(206): error A2008: syntax error : popad
+parcial.asm(224): error A2008: syntax error : main
+parcial.asm(224): error A2088: END directive required at end of file
+parcial.asm(115): error A2229: cannot use labels and 32-bit addressing in the same expression
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\BuildCustomizations\masm.targets(70,5): error MSB3721: El comando "ml64.exe /c /nologo /Zi /Fo"x64\Debug\parcial.obj" /I "C:\libreria" /I "C:\libreria" /W3 /errorReport:prompt  /Taparcial.asm" salió con el código 1.

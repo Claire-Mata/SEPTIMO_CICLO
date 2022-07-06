@@ -1,0 +1,67 @@
+ExitProcess proto
+ReadInt64 proto
+RandomRange proto
+ReadString proto
+WriteString proto
+WriteHex64 proto
+WriteInt64 proto
+Crlf proto
+TAMANIO_BUFFER=1000
+.data
+regresar qword ?
+opc qword ?
+txtErrorOpc BYTE "Ingrese una opcion valida",0
+txtRegre BYTE " ", 0ah,0dh,"Deseas volver a jugar(S) : ",0
+mensaje BYTE "Hola", 0ah,0dh, 
+"Estoy pensando en un numero entre el 1 y el 10 ", 0ah,0dh,
+"Adivina cual es:  ", 0
+mensaje3 BYTE " ", 0ah,0dh,"Ganaste!!!!!", 0
+mensaje4 BYTE " ", 0ah,0dh,"te faltaron esos numeros para ganar  ", 0ah,0dh,"Perdiste :c", 0
+num qword ?
+.code
+main proc
+Menu:
+	mov rdx, offset mensaje
+	call WriteString
+	mov rcx, 2
+	call ReadInt64
+	mov opc, rax
+	call Crlf
+	mov rax,11
+    call RandomRange
+	mov num,rax
+	call gano
+	jmp regre
+	regre:
+	mov rdx, offset txtRegre
+	call WriteString
+	mov rcx, 2
+	mov rdx,offset regresar
+    call ReadString
+    cmp regresar,'S'
+    je menu
+	cmp regresar,'s'
+	je menu
+    cmp regresar,"n"
+    jmp salir
+    salir:
+    call ExitProcess
+main endp
+gano proc
+mov rax,num
+call WriteInt64
+mov rax, opc
+cmp rax, num
+je ganar
+perder:
+mov rdx, offset mensaje4
+call WriteString
+jmp salir
+ganar:
+mov rdx, offset mensaje3
+call WriteString
+jmp salir
+salir:
+ret
+gano endp
+end
