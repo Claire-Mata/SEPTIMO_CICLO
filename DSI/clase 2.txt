@@ -1,0 +1,41 @@
+concepto sobre analisis de sistemas
+tipos de sistema:
+sistema gerencial
+sistema transaccionales
+sistema de apoyo de decisiones
+sistema en general:
+es un grupo de componentes interrelacionados que funcionan juntos para lograr un resultado deseado
+sistema de informacion:
+es un conjunto de personas, datos, procesos y tecnologia de la informacion que interactuan para recopilar, procesar y guardar y proporcionar como salida la informacion necesaria para brindar soporte a una organizacion
+tecnologia de informacion:
+termino contemporaneo que describe la combinacion de la tecnologia de computadoras, hardaware y software, con las telecomunicaciones, redes de datos, imagenes
+
+sistemas de informacion en las organizaciones, capturan y administran  datos para producir informacion util que respalda a una organizacion y sus empleados, clientes, proveedores y socios, muchas organizaciones consideran que los sitemas de informacion son escenciales para su capacidad de competir u obtener una ventaja competitiva
+
+la mayoria de las organizaciones se han percatado de q todos los trabajadores necesitan participar en el desarrollo de sistemas de informacion por tanto el desarrollo de sistemas de informacion es un tema relevante 
+
+los sistemas de informacion vienen en todo tipo, formas o tamanios, estan entrelazadas en sistemas de negocios que respaldan q con frecuencia es dificil distinguir entre sistemas de negocios y su sistema de informacion, los sistemas de informacion estan clasificados de acuerdo con sus funciones que tienen 
+
+los sistemas de procesamientos de transacciones TPS:
+son sistemas de informacion donde se capturan, procesan los datos relativos a las transacciones de negocios
+
+los sistemas de informacion administrativa MIS:
+estos proveen informes orientados a la administracion basados en los procesamientos de las transacciones y operaciones de la organizacion
+
+sistema de soporte de desiciones:
+son sistemas de informacion q ayudan a identificar oportunidades de toma de decisiones o proporcionar informacion que ayude a tomarlas 
+
+sistema de informacion ejecutiva EIS(execute information sistem):
+brindan soporte a las necesidades de planeacion y evaluacion de los administradores de nivel ejecutivo; estan adaptados a las necesidades de informacion unica de los ejecutivos que planean el negocio y evaluan el desempenio contra esos planes 
+
+sistemas expertos:
+se capturan las experiencias de los expertos humanos y luego simulan esas experiencias para la experiencia de quienes no son expertos  
+
+sistemas de comunicacion y colaboracion:
+posibilitan la comunicacion mas efectiva entre los empleados, socios, clientes y proveedores para mejorar la capacidad de colaboracion 
+
+sistema de automatizacion de oficina:
+brindan soporte a la amplia gama de actividades de oficina de los negocios para mejorar el flujo de trabajo entre los empleados ayuda a los empleados a crear documentos que los ayuden en las actividades diarias de la oficina 
+
+cuando nosotros realizamos algun sistema de informacion podemos ver lo que son:
+los involucrados en el sistema: Toda persona que tiene interes en un sistema de informacion existente o propuestos , estos se clasifican en 5 grupos 
